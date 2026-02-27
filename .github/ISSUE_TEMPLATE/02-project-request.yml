@@ -1,0 +1,72 @@
+name: "Project Request"
+description: Request details for a specific project/case snapshot.
+title: "[Project Request] <project name>"
+labels: ["request/project", "source/readme"]
+body:
+  - type: input
+    id: project_name
+    attributes:
+      label: Project name
+      placeholder: Supply Chain Visibility / Maintenance Digital Control / Other
+    validations:
+      required: true
+  - type: textarea
+    id: goal
+    attributes:
+      label: Goal
+      description: What outcome do you want from this request?
+      placeholder: Validate architecture, estimate scope, review implementation, etc.
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: Current operational/business context
+    validations:
+      required: true
+  - type: dropdown
+    id: domain
+    attributes:
+      label: Domain
+      description: Select the domain label to apply manually if missing.
+      options:
+        - domain/supply-chain
+        - domain/maintenance
+        - domain/production
+    validations:
+      required: true
+  - type: textarea
+    id: request
+    attributes:
+      label: What do you need?
+      description: Architecture, outcomes, evidence, implementation details, etc.
+    validations:
+      required: true
+  - type: textarea
+    id: constraints
+    attributes:
+      label: Constraints / NDA notes
+      description: Any confidentiality or compliance considerations.
+    validations:
+      required: true
+  - type: dropdown
+    id: timeline
+    attributes:
+      label: Timeline
+      options:
+        - ASAP (1-2 weeks)
+        - This month
+        - This quarter
+        - Exploratory / no fixed date
+    validations:
+      required: true
+  - type: dropdown
+    id: contact
+    attributes:
+      label: Preferred contact channel
+      options:
+        - GitHub issue thread
+        - LinkedIn
+    validations:
+      required: true

@@ -1,0 +1,47 @@
+name: "Inbound - Conversation"
+description: Start a collaboration conversation from the README.
+title: "[Inbound] README - Conversation"
+labels: ["intent/inbound", "source/readme", "intent/collab"]
+body:
+  - type: textarea
+    id: goal
+    attributes:
+      label: Goal
+      description: What outcome do you need?
+      placeholder: Reduce X, improve Y, evaluate Z
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: Operational/business context
+    validations:
+      required: true
+  - type: textarea
+    id: constraints
+    attributes:
+      label: Constraints
+      description: Data, timeline, compliance, team constraints
+    validations:
+      required: true
+  - type: dropdown
+    id: timeline
+    attributes:
+      label: Timeline
+      options:
+        - ASAP (1-2 weeks)
+        - This month
+        - This quarter
+        - Exploratory / no fixed date
+    validations:
+      required: true
+  - type: dropdown
+    id: contact
+    attributes:
+      label: Preferred contact channel
+      options:
+        - GitHub issue thread
+        - LinkedIn
+    validations:
+      required: true

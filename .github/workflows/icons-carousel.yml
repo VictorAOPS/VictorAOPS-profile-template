@@ -1,0 +1,49 @@
+name: Update icons-carousel.gif
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - STACK_ICONS.md
+      - scripts/gen_icons_carousel.py
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    if: ${{ !contains(github.event.head_commit.message, '[skip ci]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install system deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libcairo2 libpango-1.0-0 libgdk-pixbuf-2.0-0
+
+      - name: Install python deps
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install cairosvg pillow
+
+      - name: Generate carousel
+        run: |
+          python scripts/gen_icons_carousel.py --input STACK_ICONS.md --output images/icons/icons-carousel.gif
+
+      - name: Commit if changed
+        run: |
+          if git diff --quiet -- images/icons/icons-carousel.gif; then
+            echo "No changes."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add images/icons/icons-carousel.gif
+          git commit -m "chore: update icons-carousel.gif [skip ci]"
+          git push

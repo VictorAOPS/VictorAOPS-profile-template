@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+message: "If you reuse this template, please cite it."
+title: "VictorAOPS - GitHub Profile Template"
+type: software
+authors:
+  - given-names: "Victor David"
+    family-names: "Dector Ramirez"
+    alias: "VictorAOPS"
+repository-code: "https://github.com/VictorAOPS/VictorAOPS-profile-template"
+url: "https://github.com/VictorAOPS/VictorAOPS-profile-template"
+license: "CC-BY-4.0"
+version: "PROFILE_TEMPLATE__v1.0.0"
+date-released: "2026-02-26"
+preferred-citation:
+  type: software
+  authors:
+    - given-names: "Victor David"
+      family-names: "Dector Ramirez"
+      alias: "VictorAOPS"
+  title: "VictorAOPS - GitHub Profile Template"
+  version: "PROFILE_TEMPLATE__v1.0.0"
+  url: "https://github.com/VictorAOPS/VictorAOPS-profile-template"
+  year: 2026

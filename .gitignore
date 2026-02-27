@@ -1,0 +1,97 @@
+# =========================
+# OS / File Manager Noise
+# =========================
+.DS_Store
+Desktop.ini
+Thumbs.db
+ehthumbs.db
+
+# =========================
+# Editor / IDE
+# =========================
+.vscode/
+.idea/
+*.code-workspace
+.history/
+*.swp
+*.swo
+*~
+
+# Cursor / Copilot / misc
+.cursor/
+
+# =========================
+# Python / Virtualenv
+# =========================
+.venv/
+venv/
+.env/
+.envrc
+.python-version
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.pyre/
+.tox/
+.nox/
+.hypothesis/
+.ipynb_checkpoints/
+pip-wheel-metadata/
+*.egg-info/
+
+# Coverage
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+
+# =========================
+# Build / Cache / Runtime
+# =========================
+*.log
+.cache/
+dist/
+build/
+site/
+tmp/
+temp/
+*.tmp
+*.pid
+
+# =========================
+# Secrets / Local Env Files
+# =========================
+.env
+.env.*
+!.env.example
+
+# =========================
+# Repo-Specific Local Files
+# =========================
+# Scratch files (local-only)
+Untitled
+
+# Personal/source CV working file (not for public profile repo)
+CV.md
+
+# Design exploration docs kept local only
+README_STYLES.md
+
+# Local draft assets (do not commit)
+images/drafts/
+assets/drafts/
+
+# Local backup artifacts (do not commit)
+backup/
+
+# Archived experiments / legacy docs (keep local, avoid template pushes)
+docs/archive/experiments/
+docs/archive/readme-old.md
+docs/archive/repo-structure-legacy.md
+
+# Local restore workspace (if used)
+*-clean/

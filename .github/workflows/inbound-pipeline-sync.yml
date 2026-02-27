@@ -1,0 +1,157 @@
+name: inbound-pipeline-sync
+
+# Required setup:
+# 1) Create a PAT with scopes: repo, project
+# 2) Save as repository secret: ADD_TO_PROJECT_PAT
+# 3) Project URL expected: https://github.com/users/VictorOPEX/projects/3
+
+on:
+  issues:
+    types: [opened, reopened, labeled, unlabeled, closed]
+
+jobs:
+  sync_pipeline:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Sync Pipeline field from issue labels
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}
+          script: |
+            const owner = "VictorOPEX";
+            const repo = context.repo.repo;
+            const projectNumber = 3;
+            const issueNumber = context.issue.number;
+
+            const labels = (context.payload.issue.labels || []).map((l) => l.name.toLowerCase());
+            const issueState = context.payload.issue.state;
+
+            // Label-to-stage mapping. Supports current names plus legacy close labels.
+            const has = (name) => labels.includes(name.toLowerCase());
+            const isClosedReason =
+              has("outcome/won-project") ||
+              has("outcome/won-collab") ||
+              has("outcome/won-interview") ||
+              has("outcome/closed-no-fit") ||
+              has("outcome/closed-no-response") ||
+              has("outcome/closed-later") ||
+              has("won_project") ||
+              has("won_collab") ||
+              has("won_interview") ||
+              has("closed_no_fit") ||
+              has("closed_no_response") ||
+              has("closed_later");
+
+            let targetStage = null;
+            if (issueState === "closed" || isClosedReason) {
+              targetStage = "Closed/Won";
+            } else if (has("waiting")) {
+              targetStage = "Waiting";
+            } else if (has("in_progress")) {
+              targetStage = "In Progress";
+            } else if (has("qualified")) {
+              targetStage = "Qualified";
+            } else if (has("intent/inbound") || has("request/project")) {
+              targetStage = "New";
+            } else {
+              core.info("No matching labels/state for Pipeline sync. Skipping.");
+              return;
+            }
+
+            const data = await github.graphql(
+              `
+              query($owner: String!, $number: Int!, $repo: String!, $issue: Int!) {
+                user(login: $owner) {
+                  projectV2(number: $number) {
+                    id
+                    fields(first: 50) {
+                      nodes {
+                        ... on ProjectV2SingleSelectField {
+                          id
+                          name
+                          options {
+                            id
+                            name
+                          }
+                        }
+                      }
+                    }
+                    items(first: 100) {
+                      nodes {
+                        id
+                        content {
+                          ... on Issue { id number }
+                        }
+                      }
+                    }
+                  }
+                }
+                repository(owner: $owner, name: $repo) {
+                  issue(number: $issue) { id number }
+                }
+              }
+              `,
+              { owner, number: projectNumber, repo, issue: issueNumber }
+            );
+
+            const project = data.user?.projectV2;
+            const issue = data.repository?.issue;
+            if (!project || !issue) {
+              core.setFailed("Project or issue not found via GraphQL.");
+              return;
+            }
+
+            const pipelineField = project.fields.nodes.find(
+              (f) => f && f.name === "Pipeline" && f.options
+            );
+            if (!pipelineField) {
+              core.setFailed("Pipeline field not found in project.");
+              return;
+            }
+
+            const option = pipelineField.options.find((o) => o.name === targetStage);
+            if (!option) {
+              core.setFailed(`Pipeline option not found: ${targetStage}`);
+              return;
+            }
+
+            let item = project.items.nodes.find((n) => n.content && n.content.id === issue.id);
+
+            if (!item) {
+              const addResp = await github.graphql(
+                `
+                mutation($projectId: ID!, $contentId: ID!) {
+                  addProjectV2ItemById(input: {projectId: $projectId, contentId: $contentId}) {
+                    item { id }
+                  }
+                }
+                `,
+                { projectId: project.id, contentId: issue.id }
+              );
+              item = addResp.addProjectV2ItemById.item;
+            }
+
+            await github.graphql(
+              `
+              mutation($projectId: ID!, $itemId: ID!, $fieldId: ID!, $optionId: String!) {
+                updateProjectV2ItemFieldValue(
+                  input: {
+                    projectId: $projectId
+                    itemId: $itemId
+                    fieldId: $fieldId
+                    value: { singleSelectOptionId: $optionId }
+                  }
+                ) {
+                  projectV2Item { id }
+                }
+              }
+              `,
+              {
+                projectId: project.id,
+                itemId: item.id,
+                fieldId: pipelineField.id,
+                optionId: option.id
+              }
+            );
+
+            core.info(`Pipeline synced to: ${targetStage} for issue #${issueNumber}`);

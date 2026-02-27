@@ -1,0 +1,22 @@
+{
+  "config": {
+    "default": true,
+    "MD013": false,
+    "MD033": false,
+    "MD041": false,
+    "MD045": false,
+    "MD036": false,
+    "MD032": false,
+    "MD035": false,
+    "MD040": false,
+    "MD025": false,
+    "MD022": false,
+    "MD031": false,
+    "MD012": false,
+    "MD007": false
+  },
+  "ignores": [
+    "docs/archive/**",
+    "assets/**"
+  ]
+}

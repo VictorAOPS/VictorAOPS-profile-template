@@ -1,0 +1,26 @@
+```mermaid
+%%{init: {"theme":"base","themeVariables":{
+  "background":"#0F1115",
+  "primaryColor":"#111318",
+  "primaryTextColor":"#F4F7FB",
+  "primaryBorderColor":"#2A2F3A",
+  "lineColor":"#8A93A2",
+  "secondaryColor":"#0B0D10",
+  "tertiaryColor":"#151922",
+  "fontFamily":"Sora, ui-sans-serif, system-ui"
+}}}%%
+sequenceDiagram
+participant Ops as Ops Team
+participant App as Evidence App
+participant BI as Dashboards
+participant Gov as KPI Governance
+
+Ops->>App: Capture event + evidence (timestamp, reason)
+App->>Gov: Validate definition + owner (KPI rules)
+Gov-->>App: Accept / flag missing fields
+App->>BI: Publish signal (daily/shift)
+BI-->>Ops: Decision cue + next action
+Ops->>App: Close action + attach evidence
+
+
+```

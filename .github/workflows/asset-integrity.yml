@@ -1,0 +1,50 @@
+name: asset-integrity
+
+on:
+  push:
+    paths:
+      - 'README.md'
+      - 'images/**'
+      - '.github/workflows/asset-integrity.yml'
+  pull_request:
+    paths:
+      - 'README.md'
+      - 'images/**'
+      - '.github/workflows/asset-integrity.yml'
+
+jobs:
+  readme-assets:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate README local image references
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          mapfile -t paths < <(grep -oE 'images/[^)"[:space:]]+' README.md | sort -u)
+
+          if [ ${#paths[@]} -eq 0 ]; then
+            echo "No local images paths found in README.md"
+            exit 0
+          fi
+
+          missing=0
+          echo "Checking ${#paths[@]} image path(s) from README.md"
+
+          for p in "${paths[@]}"; do
+            if [ -f "$p" ]; then
+              echo "OK: $p"
+            else
+              echo "MISSING: $p"
+              missing=1
+            fi
+          done
+
+          if [ "$missing" -ne 0 ]; then
+            echo "Asset integrity check failed: one or more README image paths are missing."
+            exit 1
+          fi
+
+          echo "Asset integrity check passed."

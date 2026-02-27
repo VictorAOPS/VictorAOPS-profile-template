@@ -1,0 +1,22 @@
+name: inbound-auto-add-to-project
+
+# Required setup:
+# 1) Create a Personal Access Token (PAT) with scopes: repo, project
+# 2) Save it as a repository secret named: ADD_TO_PROJECT_PAT
+# Repo -> Settings -> Secrets and variables -> Actions -> New repository secret
+
+on:
+  issues:
+    types: [opened, reopened, labeled]
+
+jobs:
+  add_to_project:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Add inbound issues to Inbound Pipeline project
+        uses: actions/add-to-project@v1.0.2
+        with:
+          project-url: https://github.com/users/VictorOPEX/projects/3
+          github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}
+          labeled: intent/inbound,request/project
+          label-operator: OR
